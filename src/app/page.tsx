@@ -2,8 +2,8 @@ import Navbar from '@/components/layout/Navbar'
 
 export default function Home() {
   return (
-    <>
-      <div>Home page</div>
-    </>
+    <main className='mx-auto max-w-screen-2xl'>
+      <h2>Page</h2>
+    </main>
   )
 }

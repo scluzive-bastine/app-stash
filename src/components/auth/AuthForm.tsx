@@ -24,8 +24,13 @@ const AuthForm: FC<AuthFormProps> = ({ className, ...props }) => {
   }
   return (
     <div className={cn('flex justify-center', className)} {...props}>
-      <Button onClick={loginWithGoogle} className='w-full'>
-        <Icons.google className='w-6 h-6 mr-3' /> <span>Google</span>
+      <Button
+        onClick={loginWithGoogle}
+        className='w-full bg-black dark:bg-gray-800 hover:bg-black/80 dark:hover:bg-gray-700/50 text-white dark:text-white'
+        size='lg'
+      >
+        {isLoading ? null : <Icons.google className='w-6 h-6 mr-3' />}
+        <span>Google</span>
       </Button>
     </div>
   )

@@ -28,7 +28,7 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
           }}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='lg:mr-5'>
+      <DropdownMenuContent className='lg:mr-2'>
         <div className='flex items-center justify-start gap-2 p-2'>
           <div className='flex flex-col space-y-1 leading-none'>
             {user.name && <p className='font medium'>{user.name}</p>}
@@ -36,14 +36,14 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
           </div>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem className='py-2 text-md cursor-pointer' asChild>
           <Link href='/'>Products</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem className='py-2 text-md cursor-pointer' asChild>
           <Link href='/settings'>Settings</Link>
         </DropdownMenuItem>
         <DropdownMenuItem
-          className='cursor-pointer'
+          className='cursor-pointer text-md'
           onSelect={(event) => {
             event.preventDefault()
             signOut({

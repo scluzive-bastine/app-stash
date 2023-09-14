@@ -12,7 +12,7 @@ import UserAccountNav from '../UserAccountNav'
 const Navbar = async () => {
   const session = await getAuthSession()
   return (
-    <div className='w-full px-4 md:px-8 py-4 relative z-10 border-b border-gray-200 dark:border-gray-800'>
+    <div className='w-full px-4 md:px-8 py-4 relative z-10 border-b border-gray-200 dark:border-gray-800 h-20'>
       <div className='h-full'>
         <div className='flex justify-between'>
           <div className='flex items-center gap-8'>
