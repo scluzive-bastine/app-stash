@@ -7,7 +7,8 @@ import Search from '../Search'
 import MobileSidebar from './MobileSidebar'
 import { navigations } from '@/lib/constants'
 import { getAuthSession } from '@/lib/auth'
-import UserAccountNav from '../UserAccountNav'
+import UserAccountNav from '@/components/UserAccountNav'
+import CreateProduct from '@/components/CreateProduct'
 
 const Navbar = async () => {
   const session = await getAuthSession()
@@ -37,11 +38,14 @@ const Navbar = async () => {
               ))}
             </div>
           </div>
-          <div className='flex gap-2'>
+          <div className='flex gap-2 items-center'>
             <Search className='hidden md:flex items-center' />
             <ModeToggle />
             {session ? (
-              <UserAccountNav user={session.user} />
+              <>
+                <CreateProduct />
+                <UserAccountNav user={session.user} />
+              </>
             ) : (
               <Link href='/sign-in' className={buttonVariants({ variant: 'primary' })}>
                 Sign in

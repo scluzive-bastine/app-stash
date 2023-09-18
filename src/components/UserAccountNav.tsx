@@ -42,6 +42,8 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
         <DropdownMenuItem className='py-2 text-md cursor-pointer' asChild>
           <Link href='/settings'>Settings</Link>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem
           className='cursor-pointer text-md'
           onSelect={(event) => {

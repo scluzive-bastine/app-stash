@@ -4,6 +4,7 @@ import { Button } from '../ui/button'
 import { Icons } from '../Icons'
 import { signIn } from 'next-auth/react'
 import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
 
 const PROVIDER = 'google'
 
@@ -28,8 +29,13 @@ const AuthForm: FC<AuthFormProps> = ({ className, ...props }) => {
         onClick={loginWithGoogle}
         className='w-full bg-black dark:bg-gray-800 hover:bg-black/80 dark:hover:bg-gray-700/50 text-white dark:text-white'
         size='lg'
+        disabled={isLoading}
       >
-        {isLoading ? null : <Icons.google className='w-6 h-6 mr-3' />}
+        {isLoading ? (
+          <Loader2 className='w-6 h-6 mr-2 animate-spin' />
+        ) : (
+          <Icons.google className='w-6 h-6 mr-3' />
+        )}
         <span>Google</span>
       </Button>
     </div>

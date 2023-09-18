@@ -52,4 +52,31 @@ model User {
     image    String?
     accounts Account[]
     sessions Session[]
+    products Product[]
+}
+
+model Product {
+    id          String  @id @default(cuid())
+    title       String
+    tagLine     String
+    description String
+    websiteUrl  String
+    twitterUrl  String?
+    linkedinUrl String?
+    category    String
+    logoUrl     String
+    slug        String
+
+    owner   User   @relation(fields: [ownerId], references: [id])
+    ownerId String
+
+    productImages ProductImages[]
+}
+
+model ProductImages {
+    id    String @id @default(cuid())
+    image String
+
+    productId String
+    product   Product @relation(fields: [productId], references: [id])
 }

@@ -48,4 +48,9 @@ export const Icons = {
       <path d='M1 1h22v22H1z' fill='none' />
     </svg>
   ),
+  twitter: (props: LucideProps) => (
+    <svg {...props} viewBox='0 0 71 64' xmlns='http://www.w3.org/2000/svg'>
+      <path d='M55.9167 0H66.8038L43.0186 27.1097L71 64H49.0875L31.9275 41.6263L12.2924 64H1.39874L26.8393 35.0031L0 0H22.4621L37.9733 20.4505L55.9101 0H55.9167ZM52.0956 57.5015H58.1283L19.1874 6.15713H12.7137L52.0956 57.5015Z' />
+    </svg>
+  ),
 }

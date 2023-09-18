@@ -2,6 +2,7 @@ import '@/app/styles/globals.css'
 import Providers from '@/components/Providers'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import Navbar from '@/components/layout/Navbar'
+import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
             <Navbar />
             {children}
+            <Toaster />
           </ThemeProvider>
         </Providers>
       </body>
