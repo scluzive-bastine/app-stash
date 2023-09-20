@@ -16,7 +16,7 @@ export const navigations = [
 export const createProductLinks = [
   {
     name: 'Add Product',
-    link: '/product/create',
+    link: '/products/create',
     emoji: '🚀',
   },
   {

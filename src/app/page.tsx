@@ -1,5 +1,3 @@
-import Navbar from '@/components/layout/Navbar'
-
 export default function Home() {
   return (
     <main className='mx-auto max-w-screen-2xl'>
