@@ -1,5 +1,6 @@
 import { Icons } from '@/components/Icons'
 import UserAvatar from '@/components/UserAvatar'
+import UpVoteProduct from '@/components/products/UpVoteProduct'
 import CommentSection from '@/components/products/comments/CommentSection'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -21,6 +22,7 @@ interface pageProps {
 
 const page = async ({ params }: pageProps) => {
   const { slug } = params
+  const session = await getAuthSession()
 
   const product = await db.product.findFirst({
     where: {
@@ -35,6 +37,28 @@ const page = async ({ params }: pageProps) => {
   })
 
   if (!product) return notFound()
+
+  const productVote = product.votes.find((vote) => vote.userId === session?.user.id) // getting product vote made by the user
+
+  const calculateVotesAmount = () => {
+    let upVotes = 0
+    let downVotes = 0
+
+    product.votes.forEach((vote) => {
+      if (vote.type === 'UP') {
+        upVotes += 1
+      } else if (vote.type === 'DOWN') {
+        downVotes += 1
+      }
+    })
+
+    const totalVotes = upVotes - downVotes
+
+    // Ensure the vote count is at least 1 if there is at least one 'UP' vote
+    return totalVotes >= 0 ? totalVotes : 0
+  }
+
+  const voteAmount = calculateVotesAmount()
 
   return (
     <main className='w-full mx-auto'>
@@ -83,10 +107,12 @@ const page = async ({ params }: pageProps) => {
                   #{getCategoryName(product.category)}
                 </small>
               </div>
-              <Button>
-                {' '}
-                <ArrowBigUp className='mr-2' /> Up Vote
-              </Button>
+              {/* Up or Down voting a project */}
+              <UpVoteProduct
+                productId={product.id}
+                initialVote={productVote}
+                voteAmount={voteAmount}
+              />
             </header>
             {/* Product description */}
             <div className='text-sm mt-5 text-gray-700 dark:text-gray-300'>

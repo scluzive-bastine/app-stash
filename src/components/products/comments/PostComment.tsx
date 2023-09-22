@@ -16,6 +16,7 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { FC, useState } from 'react'
+import CommentVotes from './CommentVotes'
 
 type ExtendedComment = Comment & {
   votes: CommentVote[]
@@ -25,9 +26,11 @@ type ExtendedComment = Comment & {
 interface PostCommentProps {
   productId: string
   comment: ExtendedComment
+  votesAmount: number
+  currentVote: CommentVote | undefined
 }
 
-const PostComment: FC<PostCommentProps> = ({ productId, comment }) => {
+const PostComment: FC<PostCommentProps> = ({ productId, comment, currentVote, votesAmount }) => {
   const [isReplying, setIsReplying] = useState<boolean>(false)
   const [input, setInput] = useState<string>('')
   const router = useRouter()
@@ -79,17 +82,11 @@ const PostComment: FC<PostCommentProps> = ({ productId, comment }) => {
 
       {/* Up, Down and vote count */}
       <div className='flex mt-2 items-center flex-wrap'>
-        <div className='flex gap-x-1'>
-          <Button variant={'ghost'} aria-label='upvote' size={'icon'}>
-            <ArrowBigUp className='w-5 h-5' />
-            {/* 👍🏽 */}
-          </Button>
-          <p className='text-gray-800 dark:text-gray-100 font-semibold py-2'>30</p>
-          <Button variant={'ghost'} aria-label='upvote' size={'icon'}>
-            <ArrowBigDown className='w-5 h-5' />
-            {/* 👎🏽 */}
-          </Button>
-        </div>
+        <CommentVotes
+          commentId={comment.id}
+          initialVotesAmount={votesAmount}
+          initialVote={currentVote}
+        />
         <Button
           variant={'ghost'}
           size={'sm'}

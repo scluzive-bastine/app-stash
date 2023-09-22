@@ -54,11 +54,16 @@ const CommentSection = async ({ productId }: CommentSectionProps) => {
             return (
               <div key={topLevelComment.id} className='flex flex-col'>
                 <div className='mb-2'>
-                  <PostComment productId={productId} comment={topLevelComment} />
+                  <PostComment
+                    productId={productId}
+                    comment={topLevelComment}
+                    currentVote={topLevelCommentVote}
+                    votesAmount={topLevelCommentVotesAmt}
+                  />
                 </div>
 
                 {topLevelComment.replies
-                  .sort((a, b) => (b.votes.length = a.votes.length))
+                  .sort((a, b) => b.votes.length - a.votes.length)
                   .map((reply) => {
                     const replyVotesAmt = reply.votes.reduce((acc, vote) => {
                       if (vote.type === 'UP') return acc + 1
@@ -67,12 +72,18 @@ const CommentSection = async ({ productId }: CommentSectionProps) => {
                     }, 0)
 
                     const replyVote = reply.votes.find((vote) => vote.userId === session?.user.id)
+
                     return (
                       <div
                         key={reply.id}
                         className='ml-2 pl-4 py-2 border-l-2 border-gray-300 dark:border-gray-700'
                       >
-                        <PostComment productId={productId} comment={reply} />
+                        <PostComment
+                          productId={productId}
+                          comment={reply}
+                          currentVote={replyVote}
+                          votesAmount={replyVotesAmt}
+                        />
                       </div>
                     )
                   })}
