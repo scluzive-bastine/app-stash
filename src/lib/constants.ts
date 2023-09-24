@@ -8,8 +8,8 @@ export const navigations = [
     link: '/category',
   },
   {
-    name: 'Blog',
-    link: '/blog',
+    name: 'Discussions',
+    link: '/discussions',
   },
 ]
 
