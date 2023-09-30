@@ -2,6 +2,10 @@ import { getAuthSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { DiscussionVoteValidator } from '@/lib/validators/vote'
 import { z } from 'zod'
+import { CachedDiscussion } from '../../../../../types/redis'
+import redis from '@/lib/redis'
+
+const CACHE_AFTER_UPVOTES = 1
 
 export async function PATCH(req: Request) {
   try {
@@ -61,6 +65,23 @@ export async function PATCH(req: Request) {
       })
 
       // Caching with redis
+      const votesAmt = discussion.votes.reduce((acc, vote) => {
+        if (vote.type === 'UP') return acc + 1
+        if (vote.type === 'DOWN') return acc - 1
+        return acc
+      }, 0)
+
+      if (votesAmt >= CACHE_AFTER_UPVOTES) {
+        const cachePayload: CachedDiscussion = {
+          authorUsername: discussion.author.username ?? '',
+          content: JSON.stringify(discussion.content),
+          id: discussion.id,
+          title: discussion.title,
+          currentVote: voteType,
+          createdAt: discussion.createdAt,
+        }
+        await redis.hset(`discussion:${discussion.slug}`, cachePayload)
+      }
 
       return new Response('OK')
     }
@@ -73,6 +94,25 @@ export async function PATCH(req: Request) {
         type: voteType,
       },
     })
+
+    // Caching with redis
+    const votesAmt = discussion.votes.reduce((acc, vote) => {
+      if (vote.type === 'UP') return acc + 1
+      if (vote.type === 'DOWN') return acc - 1
+      return acc
+    }, 0)
+
+    if (votesAmt >= CACHE_AFTER_UPVOTES) {
+      const cachePayload: CachedDiscussion = {
+        authorUsername: discussion.author.username ?? '',
+        content: JSON.stringify(discussion.content),
+        id: discussion.id,
+        title: discussion.title,
+        currentVote: voteType,
+        createdAt: discussion.createdAt,
+      }
+      await redis.hset(`discussion:${discussion.slug}`, cachePayload)
+    }
 
     return new Response('OK')
   } catch (error) {

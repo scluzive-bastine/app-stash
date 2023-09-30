@@ -21,7 +21,7 @@ export const createProductLinks = [
   },
   {
     name: 'Create Post',
-    link: '/discussion/create',
+    link: '/discussions/create',
     emoji: '💬',
   },
 ]

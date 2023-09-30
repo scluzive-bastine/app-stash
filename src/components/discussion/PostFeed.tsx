@@ -1,59 +1,76 @@
-import React from 'react'
+'use client'
+import React, { useEffect, useRef } from 'react'
 import { ExtendedDiscussion } from '../../../types/db'
-import Link from 'next/link'
-import UserAvatar from '../UserAvatar'
-import { ArrowBigDown, ArrowBigUp, MessageSquare, MessagesSquare } from 'lucide-react'
-import { Button } from '../ui/button'
-import { cn } from '@/lib/utils'
+import Post from './Post'
+import { useSession } from 'next-auth/react'
+import { getAuthSession } from '@/lib/auth'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { INFINITE_SCROLLING_PAGINATION_RESULTS } from '@/config'
+import axios from 'axios'
+import { useIntersection } from '@mantine/hooks'
+import { Skeleton } from '../ui/skeleton'
+import PostLoader from './PostLoader'
 
 interface PostFeedProps {
   discussions: ExtendedDiscussion[]
 }
 
 const PostFeed = ({ discussions }: PostFeedProps) => {
+  const { data: session } = useSession()
+  const lastPostRef = useRef<HTMLElement>(null)
+  const { ref, entry } = useIntersection({
+    root: lastPostRef.current,
+    threshold: 1,
+  })
+
+  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
+    ['infinite-query'],
+    async ({ pageParam = 1 }) => {
+      const query = `/api/posts?limit=${INFINITE_SCROLLING_PAGINATION_RESULTS}&page=${pageParam}`
+
+      const { data } = await axios.get(query)
+      return data as ExtendedDiscussion[]
+    },
+    {
+      getNextPageParam: (_, pages) => {
+        return pages.length + 1
+      },
+
+      initialData: { pages: [discussions], pageParams: [1] },
+    }
+  )
+
+  useEffect(() => {
+    if (entry?.isIntersecting) {
+      fetchNextPage()
+    }
+  }, [entry, fetchNextPage])
+
+  console.log(isFetchingNextPage)
+
+  const posts = data?.pages.flatMap((page) => page) ?? discussions
   return (
-    <div className='w-full'>
-      {discussions.map((discussion) => (
-        <div
-          key={discussion.id}
-          className='pb-2 border-b border-gray-300 dark:border-gray-700 flex space-x-5 items-start'
-        >
-          <div className='flex-shrink-0'>
-            <UserAvatar user={discussion.author} />
-          </div>
-          <div>
-            <Link
-              href={`/discussions/${discussion.slug}`}
-              className='text-lg font-semibold text-gray-800 dark:text-gray-200'
-            >
-              {discussion.title}
-            </Link>
-            <p className='text-sm text-gray-500'>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Pariatur accusamus in et
-              nemo reprehenderit. Reiciendis fugit sint molestiae veritatis mollitia!
-            </p>
-            <div className=' mt-2 flex space-x-4 items-center'>
-              <div className='flex gap-1 items-center'>
-                <Button className={''} variant={'ghost'} aria-label='upvote' size={'icon'}>
-                  <ArrowBigUp className={cn('w-5 h-5')} />
-                </Button>
-                <p className='text-gray-800 dark:text-gray-100 font-semibold py-2 text-sm'>1</p>
-                <Button variant={'ghost'} aria-label='downvote' size={'icon'}>
-                  <ArrowBigDown className={cn('w-5 h-5')} />
-                </Button>
-              </div>
-              <Link
-                href={`/discussions/${discussion.slug}`}
-                className='flex w-fit items-center gap-2 text-sm text-gray-500'
-              >
-                <MessageSquare className='w-4 h-4' />0 Comments
-              </Link>
-              <p className='text-gray-500 text-sm'>20 mins ago</p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
+    <ul>
+      {posts.map((discussion) => {
+        const voteAmount = discussion.votes.reduce((acc, vote) => {
+          if (vote.type === 'UP') return acc + 1
+          if (vote.type === 'DOWN') return acc - 1
+          return acc
+        }, 0)
+
+        const currentVote = discussion.votes.find((vote) => vote.userId === session?.user.id)?.type
+        return (
+          <li key={discussion.id} ref={ref}>
+            <Post
+              discussion={discussion}
+              initialVotesAmount={voteAmount}
+              initialVote={currentVote}
+            />
+          </li>
+        )
+      })}
+      {isFetchingNextPage && <PostLoader />}
+    </ul>
   )
 }
 

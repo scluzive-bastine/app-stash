@@ -2,10 +2,14 @@ import EditorOutput from '@/components/discussion/EditorOutput'
 import CommentSection from '@/components/discussion/comments/CommentSection'
 import DiscussionVoteServer from '@/components/discussion/discussion-vote/DiscussionVoteServer'
 import { db } from '@/lib/db'
+import redis from '@/lib/redis'
 import { formatTimeToNow } from '@/lib/utils'
 import { Discussion, DiscussionCommentVote, DiscussionVote, User } from '@prisma/client'
 import { notFound } from 'next/navigation'
-import React from 'react'
+import React, { Suspense } from 'react'
+import { CachedDiscussion } from '../../../../types/redis'
+import { ArrowBigUp, Loader2 } from 'lucide-react'
+import { buttonVariants } from '@/components/ui/button'
 
 interface PageProps {
   params: {
@@ -15,8 +19,10 @@ interface PageProps {
 
 const page = async ({ params }: PageProps) => {
   const { slug } = params
+  // const cachedDiscussion = (await redis.hgetall(`discussion:${slug}`)) as CachedDiscussion
   let post: (Discussion & { votes: DiscussionVote[]; author: User }) | null = null
 
+  // if (!cachedDiscussion) {
   post = await db.discussion.findFirst({
     where: {
       slug,
@@ -26,6 +32,7 @@ const page = async ({ params }: PageProps) => {
       author: true,
     },
   })
+  // }
 
   if (!post) return notFound()
   return (
@@ -45,11 +52,13 @@ const page = async ({ params }: PageProps) => {
           }}
           className='hidden md:flex'
         />
-        <div className='order-first md:order-none'>
+        <div className='order-first md:order-none w-full'>
           <div className='flex flex-col gap-2 mb-10'>
-            <h1 className='text-xl font-semibold py-2 leading-6 text-gray-900'>{post?.title}</h1>
+            <h1 className='text-xl font-semibold py-2 leading-6 text-gray-900 dark:text-gray-100'>
+              {post.title}
+            </h1>
             <p className='max-h-40 mt-1 truncate text-xs text-gray-500'>
-              Posted by {post?.author.name} | {formatTimeToNow(new Date(post?.createdAt))}
+              Posted by {post.author.name} | {formatTimeToNow(new Date(post.createdAt))}
             </p>
             <DiscussionVoteServer
               discussionId={post.id}
